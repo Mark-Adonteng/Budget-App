@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<head>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+     <title> Budget App </title>
+     <style>
+       
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    background-color: grey;
+}
+
+.big-container {
+    width: 40%;
+    font-size: 16px;
+    max-width: 43.753m;
+    margin: 1em auto;
+}
+
+.container{
+    width: 100%;
+}
+
+.sub-container{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3em;
+}
+
+.flex{
+    display: flex;
+    align-items: center;
+}
+
+.flex-space{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.big-container h3{
+    color: grey;
+    font-weight: 500;
+    margin-bottom: 0.6em;
+}
+
+.container input{
+    display: block;
+    width: 100%;
+    padding: 0.6em 0.3em;
+    border: 1px solid whitesmoke;
+    border-radius: 0.3em;
+    color: black;
+    outline: none;
+    font-weight: 400;
+    margin-bottom: 0.6em;
+}
+
+.container input:focus{
+    border-color: blue;
+}
+
+.total-amount-container, .user-amount-container{
+    background: whitesmoke;
+    padding: 1.25em 0.9em;
+    border-radius: 0.3em;
+   ;
+}
+
+.output-container{
+    background-color: navy;
+    color:whitesmoke;
+    border-radius: 0.3em;
+    margin: 2em 0;
+    padding: 1.2em;
+}
+
+.output-container p{
+    font-weight: 500;
+    margin-bottom: 0.6em;
+}
+
+.output-container span{
+    display: block;
+    text-align: center;
+    font-weight: 400;
+    color: whitesmoke;
+}
+
+.submit{
+    font-size: 1em;
+    margin-top: 0.8em;
+    background-color: blue;
+    border: none;
+    outline: none;
+    color:white;
+    padding: 0.6em 1.2em;
+    border-radius: 0.3em;
+    cursor: pointer;
+}
+
+.list{
+    background-color: white;
+    padding: 1.8em 1.2em;
+    border-radius: 0.6em;
+}
+
+.sublist-content{
+    width: 100%;
+    border-left: 0.3em solid navy;
+    margin-bottom: 0.6em;
+    padding: 0.5em 1em;
+    display: grid;
+    grid-template-columns: 3fr 2fr 1fr 1fr;
+}
+
+.product{
+    font-weight: 500;
+    color:black;
+}
+
+.amount{
+    color:black;
+    margin-left: 20%;
+}
+
+.icons-container{
+    width: 5em;
+    margin: 1.2em;
+    align-items: center;
+}
+
+.product-title{
+    margin-bottom: 1em;
+}
+
+.hide{
+    display: none;
+}
+
+.error{
+    color:red;
+}
+
+.edit{
+    margin-left: auto;
+}
+
+.edit, .delete{
+    background: transparent;
+    cursor: pointer;
+    margin-right: 1.5em;
+    border: none;
+    color:navy;
+}
+
+
+
+     </style>
+</head>
+<body>
+    <div class="big-container">
+        <div class="container">
+            <div class="sub-container">
+                <div class="total-amount-container">
+                    <h3>Budget</h3>
+                    <p class="hide error" id="budget-error">
+                        Value cannot be empty or negative
+                    </p>
+                    <input type="number" id="total-amount" placeholder="Enter  Amount">
+                    <button class="submit" id="total-amount-button">
+                        Set Budget
+                    </button>
+                </div>
+                <div class="user-amount-container">
+                    <h3>Expenses</h3>
+                    <p class="hide error" id="product-title-error">
+                        Values cannot be empty
+                    </p>
+                    <input type="text" class="product-title" id="product-title" placeholder="Enter Product">
+                    <input type="number" id="user-amount" placeholder="Enter Cost">
+                    <button class="submit" id="check-amount">Check Amount</button>
+
+                </div>
+            </div>
+            <div class="output-container flex-space">
+                <div>
+                    <p>Total Budget</p>
+                    <span id="amount">
+                        0
+                    </span>
+                </div>
+                <div>
+                    <p>Expenses</p>
+                    <span id="expenditure-value">
+                        0
+                    </span>
+                </div>
+                <div>
+                    <p>Balance</p>
+                    <span id="balance-amount">
+                        0
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="list">
+            <h3>Expenses List</h3>
+            <div class="list-container" id="list"></div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+    let totalAmount = document.getElementById("total-amount");
+    let userAmount = document.getElementById("user-amount");
+    const checkAmountButton = document.getElementById("check-amount");
+    const totalAmountButton = document.getElementById("total-amount-button");
+    const productTitle = document.getElementById("product-title");
+    const errorMessage = document.getElementById("budget-error");
+    const productTitleError = document.getElementById("product-title-error");
+    const productCostError = document.getElementById("product-cost-error");
+    const amount = document.getElementById("amount");
+    const expenditureValue = document.getElementById("expenditure-value");
+    const balanceValue = document.getElementById("balance-amount");
+    const list = document.getElementById("list");
+    let tempAmount = 0; 
+
+    
+    totalAmountButton.addEventListener("click", () => {
+        let enteredAmount = parseFloat(totalAmount.value);
+        if (isNaN(enteredAmount) || enteredAmount < 0) {
+            errorMessage.classList.remove("hide");
+        } else {
+            errorMessage.classList.add("hide");
+            tempAmount += enteredAmount;
+            amount.innerText = tempAmount;
+            balanceValue.innerText = tempAmount - parseFloat(expenditureValue.innerText);
+            totalAmount.value = ""; 
+        }
+    });
+
+    const disableButtons = (bool) => {
+        let editButtons = document.getElementsByClassName("edit");
+        Array.from(editButtons).forEach((element) => {
+            element.disabled = bool;
+        });
+    };
+    const modifyElement = (element, edit = false) => {
+        let parentDiv = element.parentElement;
+        let currentBalance = balanceValue.innerText;
+        let currentExpense = expenditureValue.innerText;
+        let parentAmount = parentDiv.querySelector(".amount").innerText;
+        if (edit) {
+            let parentText = parentDiv.querySelector(".product").innerText;
+            productTitle.value = parentText;
+            userAmount.value = parentAmount;
+            disableButtons(true);
+        }
+        balanceValue.innerText = parseFloat(currentBalance) + parseFloat(parentAmount);
+        expenditureValue.innerText = parseFloat(currentExpense) - parseFloat(parentAmount);
+        parentDiv.remove();
+    };
+    const listCreator = (expenseName, expenseValue) => {
+    let subListContent = document.createElement("div");
+    subListContent.classList.add("sublist-content", "flex-space");
+    list.appendChild(subListContent);
+    subListContent.innerHTML = `<p class="product">${expenseName}</p><p class="amount">${expenseValue}</p>`;
+    let editButton = document.createElement("button");
+    editButton.classList.add("fa-solid", "fa-pen-to-square", "edit");
+    editButton.style.fontSize = "1.2em";
+    editButton.addEventListener("click", () => {
+        modifyElement(editButton, true);
+    });
+    let deleteButton = document.createElement("button");
+    deleteButton.classList.add("fa-solid", "fa-trash-can", "delete");
+    deleteButton.style.fontSize = "1.2em";
+    deleteButton.addEventListener("click", () => {
+        modifyElement(deleteButton);
+    });
+    subListContent.appendChild(editButton);
+    subListContent.appendChild(deleteButton);
+    document.getElementById("list").appendChild(subListContent);
+};
+
+checkAmountButton.addEventListener("click", () => {
+    
+    if (!userAmount.value || !productTitle.value) {
+        productTitleError.classList.remove("hide");
+        return false;
+    }
+    
+    disableButtons(false);
+
+    let expenditure = parseInt(userAmount.value);
+    let sum = parseInt(expenditureValue.innerText) + expenditure;
+    expenditureValue.innerText = sum;
+    const totalBalance = tempAmount - sum;
+    balanceValue.innerText = totalBalance;
+    listCreator(productTitle.value, userAmount.value);
+    productTitle.value = "";
+    userAmount.value = "";
+});
+</script>
+
+</body>
+</html>
